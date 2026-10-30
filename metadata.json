@@ -1,0 +1,6 @@
+{
+  "name": "CampusHelp - Student Marketplace & AI Assistant",
+  "description": "Student peer services marketplace with AI-powered matching via Google Gemma, verified student helpers, peer tutoring, dorm errands, escrow payments, and live chat.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
