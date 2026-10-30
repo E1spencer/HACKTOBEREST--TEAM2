@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AlertTriangle, X, ShieldAlert } from 'lucide-react';
+import { motion } from 'motion/react';
 import { api } from '../lib/api.ts';
 import { Booking } from '../types/marketplace.ts';
 
@@ -35,22 +36,27 @@ export const DisputeModal: React.FC<DisputeModalProps> = ({ booking, onClose, on
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-4">
+    <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in">
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        className="glass-panel bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl relative space-y-4 border border-white/10"
+      >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+          className="absolute right-4 top-4 p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600">
+          <div className="w-10 h-10 rounded-2xl bg-rose-950/80 border border-rose-500/40 flex items-center justify-center text-rose-400">
             <ShieldAlert className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-900">Campus Trust & Safety Concern</h2>
-            <p className="text-xs text-slate-500">
+            <h2 className="text-base font-extrabold text-white font-heading">Campus Safety & Trust Concern</h2>
+            <p className="text-xs text-slate-400">
               Escrow release will be frozen while Dean of Students reviews this booking.
             </p>
           </div>
@@ -58,11 +64,11 @@ export const DisputeModal: React.FC<DisputeModalProps> = ({ booking, onClose, on
 
         <form onSubmit={handleSubmit} className="space-y-4 text-xs">
           <div>
-            <label className="font-semibold text-slate-700 block mb-1">Issue Category</label>
+            <label className="font-semibold text-slate-300 block mb-1">Issue Category</label>
             <select
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-none"
+              className="w-full px-3 py-2.5 bg-slate-800 border border-white/10 rounded-xl text-xs text-white focus:outline-none"
             >
               <option value="Helper No-Show / Over 30 mins late">Helper No-Show (Over 30 mins late)</option>
               <option value="Work Incomplete or Substandard">Work Incomplete or Substandard</option>
@@ -73,39 +79,39 @@ export const DisputeModal: React.FC<DisputeModalProps> = ({ booking, onClose, on
           </div>
 
           <div>
-            <label className="font-semibold text-slate-700 block mb-1">Detailed Explanation & Evidence</label>
+            <label className="font-semibold text-slate-300 block mb-1">Detailed Explanation & Evidence</label>
             <textarea
               rows={4}
               required
               value={evidenceText}
               onChange={(e) => setEvidenceText(e.target.value)}
               placeholder="Describe what happened in detail. Chat logs and timestamps will be automatically cross-referenced by the administrator."
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-rose-500"
+              className="w-full px-3 py-2 bg-slate-800 border border-white/10 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-rose-500"
             />
           </div>
 
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-[11px] text-amber-900">
+          <div className="bg-amber-950/60 border border-amber-500/40 rounded-2xl p-3 text-[11px] text-amber-200">
             <strong>Escrow Freeze Guarantee:</strong> Opening this dispute freezes payment of ${(booking.priceSnapshot.totalMinor / 100).toFixed(2)}. The administrator can issue a full or partial refund to your student account.
           </div>
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+          <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg"
+              className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white rounded-xl"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold shadow-sm"
+              className="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold shadow-md cursor-pointer"
             >
               {loading ? 'Submitting...' : 'Freeze Escrow & Open Dispute'}
             </button>
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };

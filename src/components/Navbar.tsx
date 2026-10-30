@@ -11,8 +11,9 @@ import {
   ChevronDown,
   CheckCircle2,
   RefreshCw,
-  ExternalLink,
+  Zap,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { api } from '../lib/api.ts';
 import { User, Notification } from '../types/marketplace.ts';
 
@@ -72,91 +73,65 @@ export const Navbar: React.FC<NavbarProps> = ({
     }
   };
 
+  const navItems = [
+    { id: 'ai-assistant', label: 'AI Match', icon: Sparkles, color: 'text-indigo-400' },
+    { id: 'catalog', label: 'Browse Helpers', icon: Search, color: 'text-slate-300' },
+    { id: 'bookings', label: 'Bookings & Escrow', icon: CalendarDays, color: 'text-cyan-400' },
+    { id: 'helper-portal', label: 'Helper Workspace', icon: Briefcase, color: 'text-emerald-400' },
+    { id: 'admin', label: 'Trust & Admin', icon: ShieldCheck, color: 'text-amber-400' },
+  ];
+
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
+    <header className="sticky top-0 z-40 glass-panel border-b border-white/10 shadow-lg shadow-black/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo and Brand */}
-          <div className="flex items-center gap-8">
+          {/* Brand Logo */}
+          <div className="flex items-center gap-6">
             <button
               onClick={() => onTabChange('ai-assistant')}
               className="flex items-center gap-2.5 text-left group focus:outline-none"
             >
-              <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-sm shadow-indigo-200 group-hover:bg-indigo-700 transition-colors">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-indigo-500/30 group-hover:scale-105 transition-transform">
                 <GraduationCap className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-1.5">
+                <span className="text-base font-extrabold tracking-tight text-white flex items-center gap-1.5 font-heading">
                   CampusHelp
-                  <span className="text-[10px] uppercase font-semibold tracking-wider px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
-                    Gemma AI
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                    Gemma 2
                   </span>
                 </span>
-                <span className="text-[11px] text-slate-500 block -mt-0.5">Oakwood University Peer Network</span>
+                <span className="text-[11px] text-slate-400 block -mt-0.5">Oakwood University Peer Network</span>
               </div>
             </button>
 
-            {/* Navigation Tabs */}
-            <nav className="hidden md:flex items-center gap-1">
-              <button
-                onClick={() => onTabChange('ai-assistant')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                  currentTab === 'ai-assistant'
-                    ? 'bg-indigo-50 text-indigo-700 font-bold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
-                AI Match Assistant
-              </button>
-
-              <button
-                onClick={() => onTabChange('catalog')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                  currentTab === 'catalog'
-                    ? 'bg-slate-100 text-slate-900'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                <Search className="w-3.5 h-3.5" />
-                Browse Helpers
-              </button>
-
-              <button
-                onClick={() => onTabChange('bookings')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                  currentTab === 'bookings'
-                    ? 'bg-slate-100 text-slate-900'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                <CalendarDays className="w-3.5 h-3.5" />
-                My Bookings & Escrow
-              </button>
-
-              <button
-                onClick={() => onTabChange('helper-portal')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                  currentTab === 'helper-portal'
-                    ? 'bg-emerald-50 text-emerald-800'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                <Briefcase className="w-3.5 h-3.5 text-emerald-600" />
-                Helper Workspace
-              </button>
-
-              <button
-                onClick={() => onTabChange('admin')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                  currentTab === 'admin'
-                    ? 'bg-amber-50 text-amber-800'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
-                Trust & Admin
-              </button>
+            {/* Desktop Navigation Tabs with Animated Pill */}
+            <nav className="hidden md:flex items-center gap-1 bg-slate-900/60 p-1 rounded-xl border border-white/5">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = currentTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => onTabChange(item.id)}
+                    className={`relative flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
+                      isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeTabBadge"
+                        className="absolute inset-0 bg-indigo-600 rounded-lg shadow-sm shadow-indigo-500/40"
+                        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10 flex items-center gap-1.5">
+                      <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : item.color}`} />
+                      <span>{item.label}</span>
+                    </span>
+                  </button>
+                );
+              })}
             </nav>
           </div>
 
@@ -166,70 +141,79 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={onOpenSettings}
               title="Configure OpenRouter Gemma Key and Model"
-              className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors flex items-center gap-1.5 text-xs font-medium border border-slate-200"
+              className="p-2 text-slate-300 hover:text-white bg-slate-900/60 hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-1.5 text-xs font-medium border border-white/10"
             >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-indigo-600" />
-              <span className="hidden sm:inline">Gemma AI Settings</span>
+              <SlidersHorizontal className="w-3.5 h-3.5 text-indigo-400" />
+              <span className="hidden sm:inline">Gemma Settings</span>
             </button>
 
             {/* Notifications Popover */}
             <div className="relative">
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors relative"
+                className="p-2 text-slate-300 hover:text-white bg-slate-900/60 hover:bg-slate-800 rounded-lg transition-colors relative border border-white/10"
                 aria-label="Notifications"
               >
                 <Bell className="w-4 h-4" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white animate-pulse" />
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-slate-950 animate-pulse" />
                 )}
               </button>
 
-              {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 p-3 z-50 animate-in fade-in slide-in-from-top-2">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-2">
-                    <span className="text-xs font-bold text-slate-900">Campus Alerts</span>
-                    <span className="text-[11px] text-slate-500">{unreadCount} unread</span>
-                  </div>
-                  <div className="max-h-64 overflow-y-auto space-y-2">
-                    {notifications.length === 0 ? (
-                      <p className="text-xs text-slate-500 text-center py-4">No campus notifications yet.</p>
-                    ) : (
-                      notifications.map((n) => (
-                        <div
-                          key={n.id}
-                          onClick={() => handleMarkAsRead(n.id)}
-                          className={`p-2.5 rounded-lg text-xs cursor-pointer transition-colors ${
-                            n.readAt ? 'bg-slate-50 text-slate-600' : 'bg-indigo-50/70 text-slate-900 font-medium'
-                          }`}
-                        >
-                          <p className="font-semibold text-slate-900 flex items-center justify-between">
-                            {n.title}
-                            {!n.readAt && <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />}
-                          </p>
-                          <p className="text-[11px] text-slate-600 mt-0.5">{n.body}</p>
-                          <span className="text-[10px] text-slate-400 mt-1 block">
-                            {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
+              <AnimatePresence>
+                {showNotifications && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 mt-2 w-80 glass-panel bg-slate-900/95 rounded-2xl shadow-2xl border border-white/10 p-3.5 z-50"
+                  >
+                    <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-2">
+                      <span className="text-xs font-bold text-white font-heading">Campus Alerts</span>
+                      <span className="text-[11px] text-indigo-400 font-medium">{unreadCount} unread</span>
+                    </div>
+                    <div className="max-h-64 overflow-y-auto space-y-2">
+                      {notifications.length === 0 ? (
+                        <p className="text-xs text-slate-400 text-center py-4">No campus notifications yet.</p>
+                      ) : (
+                        notifications.map((n) => (
+                          <div
+                            key={n.id}
+                            onClick={() => handleMarkAsRead(n.id)}
+                            className={`p-2.5 rounded-xl text-xs cursor-pointer transition-all ${
+                              n.readAt
+                                ? 'bg-slate-800/40 text-slate-400'
+                                : 'bg-indigo-950/60 border border-indigo-500/30 text-white'
+                            }`}
+                          >
+                            <p className="font-semibold text-white flex items-center justify-between">
+                              {n.title}
+                              {!n.readAt && <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />}
+                            </p>
+                            <p className="text-[11px] text-slate-300 mt-0.5">{n.body}</p>
+                            <span className="text-[10px] text-slate-500 mt-1 block">
+                              {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Quick Campus Persona Switcher */}
             <div className="relative">
               <button
                 onClick={() => setShowUserDropdown(!showUserDropdown)}
-                className="flex items-center gap-2 p-1.5 pl-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors text-left"
+                className="flex items-center gap-2 p-1.5 pl-2.5 rounded-xl bg-slate-900/70 border border-white/10 hover:border-indigo-500/40 transition-colors text-left"
               >
                 <div className="hidden sm:block text-right">
-                  <span className="text-xs font-semibold text-slate-900 block leading-tight">
+                  <span className="text-xs font-bold text-white block leading-tight font-heading">
                     {currentUser?.displayName || 'Select User'}
                   </span>
-                  <span className="text-[10px] text-slate-500 uppercase tracking-wider block">
+                  <span className="text-[10px] text-indigo-400 uppercase tracking-wider block font-semibold">
                     {currentUser?.role === 'client'
                       ? 'Student Client'
                       : currentUser?.role === 'agent'
@@ -240,61 +224,92 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <img
                   src={currentUser?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80'}
                   alt="Avatar"
-                  className="w-7 h-7 rounded-full object-cover ring-1 ring-slate-200"
+                  className="w-7 h-7 rounded-full object-cover ring-2 ring-indigo-500/30"
                 />
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
 
-              {showUserDropdown && (
-                <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 p-2 z-50">
-                  <div className="px-2 py-1.5 border-b border-slate-100 mb-1">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Switch Demo Persona
-                    </span>
-                    <span className="text-[11px] text-slate-500">
-                      Experience buyer, seller, and administrator views
-                    </span>
-                  </div>
-                  <div className="space-y-1">
-                    {users.map((u) => (
+              <AnimatePresence>
+                {showUserDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 mt-2 w-72 glass-panel bg-slate-900/95 rounded-2xl shadow-2xl border border-white/10 p-2.5 z-50"
+                  >
+                    <div className="px-2 py-1.5 border-b border-white/10 mb-1.5">
+                      <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">
+                        Switch Persona
+                      </span>
+                      <span className="text-[11px] text-slate-400">
+                        Test Client, Helper & Admin workflows
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      {users.map((u) => (
+                        <button
+                          key={u.id}
+                          onClick={() => {
+                            onUserSwitch(u);
+                            setShowUserDropdown(false);
+                          }}
+                          className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors ${
+                            currentUser?.id === u.id
+                              ? 'bg-indigo-600/30 border border-indigo-500/40 text-white font-semibold'
+                              : 'hover:bg-white/5 text-slate-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <img src={u.avatarUrl} alt="" className="w-6 h-6 rounded-full object-cover" />
+                            <div>
+                              <span className="block font-medium text-white">{u.displayName}</span>
+                              <span className="text-[10px] text-slate-400 capitalize">
+                                {u.role} · {u.campusDorm.split(',')[0]}
+                              </span>
+                            </div>
+                          </div>
+                          {currentUser?.id === u.id && <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="pt-2 mt-2 border-t border-white/10">
                       <button
-                        key={u.id}
                         onClick={() => {
-                          onUserSwitch(u);
+                          onResetSeed();
                           setShowUserDropdown(false);
                         }}
-                        className={`w-full flex items-center justify-between p-2 rounded-lg text-left text-xs transition-colors ${
-                          currentUser?.id === u.id ? 'bg-indigo-50 text-indigo-900 font-semibold' : 'hover:bg-slate-50 text-slate-700'
-                        }`}
+                        className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[11px] font-medium text-slate-400 hover:text-white rounded-lg transition-colors hover:bg-white/5"
                       >
-                        <div className="flex items-center gap-2">
-                          <img src={u.avatarUrl} alt="" className="w-6 h-6 rounded-full object-cover" />
-                          <div>
-                            <span className="block font-medium">{u.displayName}</span>
-                            <span className="text-[10px] text-slate-500 capitalize">{u.role} · {u.campusDorm.split(',')[0]}</span>
-                          </div>
-                        </div>
-                        {currentUser?.id === u.id && <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600" />}
+                        <RefreshCw className="w-3 h-3 text-indigo-400" />
+                        Reset Demo Seed Data
                       </button>
-                    ))}
-                  </div>
-
-                  <div className="pt-2 mt-2 border-t border-slate-100">
-                    <button
-                      onClick={() => {
-                        onResetSeed();
-                        setShowUserDropdown(false);
-                      }}
-                      className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[11px] font-medium text-slate-500 hover:text-slate-800 rounded transition-colors"
-                    >
-                      <RefreshCw className="w-3 h-3" />
-                      Reset Demo Seed Data
-                    </button>
-                  </div>
-                </div>
-              )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
+        </div>
+
+        {/* Mobile Navigation Row */}
+        <div className="flex md:hidden items-center gap-1 overflow-x-auto py-2 border-t border-white/5 scrollbar-none">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = currentTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => onTabChange(item.id)}
+                className={`flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded-lg shrink-0 ${
+                  isActive ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-white/5'
+                }`}
+              >
+                <Icon className="w-3 h-3" />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </header>

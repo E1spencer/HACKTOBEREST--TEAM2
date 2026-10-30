@@ -7,6 +7,7 @@ import {
   ShieldAlert,
   ShieldCheck,
 } from 'lucide-react';
+import { motion } from 'motion/react';
 import { api } from '../lib/api.ts';
 import { Message, Conversation, User } from '../types/marketplace.ts';
 
@@ -25,7 +26,7 @@ export const ChatModal: React.FC<ChatModalProps> = ({ bookingId, currentUser, on
 
   useEffect(() => {
     loadChat();
-    const interval = setInterval(loadChat, 3000); // 3s polling for real-time feel
+    const interval = setInterval(loadChat, 3000);
     return () => clearInterval(interval);
   }, [bookingId]);
 
@@ -63,53 +64,58 @@ export const ChatModal: React.FC<ChatModalProps> = ({ bookingId, currentUser, on
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
-      <div className="bg-white rounded-2xl max-w-lg w-full h-[520px] shadow-2xl flex flex-col overflow-hidden">
+    <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in">
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        className="glass-panel bg-slate-900 rounded-3xl max-w-lg w-full h-[540px] shadow-2xl flex flex-col overflow-hidden border border-white/10"
+      >
         {/* Header */}
-        <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
+        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-slate-950/60">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
+            <div className="w-8 h-8 rounded-xl bg-indigo-950/80 border border-indigo-500/40 flex items-center justify-center text-indigo-400 font-bold">
               <MessageSquare className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-xs font-bold text-slate-900">
+              <h3 className="text-xs font-bold text-white font-heading">
                 In-Booking Live Chat · #{bookingId}
               </h3>
-              <p className="text-[10px] text-slate-500">
+              <p className="text-[10px] text-slate-400">
                 {conversation?.serviceTitle || 'Peer Coordination'}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+            className="p-1 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Anti-Leakage Notice Banner (Prompt 10.2) */}
+        {/* Anti-Leakage Notice Banner */}
         {warningBanner && (
-          <div className="bg-amber-50 border-b border-amber-200 p-2.5 text-[11px] text-amber-900 flex items-start gap-2">
-            <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <div className="bg-amber-950/80 border-b border-amber-500/40 p-2.5 text-[11px] text-amber-200 flex items-start gap-2">
+            <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
             <div className="flex-1">
               <p className="font-semibold">{warningBanner}</p>
-              <p className="text-[10px] text-amber-700">
-                Direct phone calls or off-platform payment apps void your student money-back guarantee.
+              <p className="text-[10px] text-amber-300">
+                External payments void your student money-back guarantee.
               </p>
             </div>
           </div>
         )}
 
         {/* Message Thread */}
-        <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/50">
+        <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-950/40">
           {loading ? (
-            <p className="text-xs text-slate-400 text-center py-8">Loading message history...</p>
+            <p className="text-xs text-slate-500 text-center py-8">Loading message history...</p>
           ) : messages.length === 0 ? (
             <div className="text-center py-12 text-xs text-slate-400">
               <ShieldCheck className="w-8 h-8 text-indigo-400 mx-auto mb-2" />
-              <p className="font-medium text-slate-600">Secure conversation started</p>
-              <p className="text-[11px]">Coordinate meeting room, arrival time, or equipment needed.</p>
+              <p className="font-semibold text-white font-heading">Secure conversation initialized</p>
+              <p className="text-[11px] mt-0.5">Coordinate meeting hall, arrival time, or materials needed.</p>
             </div>
           ) : (
             messages.map((m) => {
@@ -119,7 +125,7 @@ export const ChatModal: React.FC<ChatModalProps> = ({ bookingId, currentUser, on
                   key={m.id}
                   className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}
                 >
-                  <span className="text-[10px] text-slate-400 mb-0.5 px-1 font-medium">
+                  <span className="text-[10px] text-slate-500 mb-0.5 px-1 font-medium">
                     {isMine ? 'You' : m.senderName} ·{' '}
                     {new Date(m.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
@@ -127,13 +133,13 @@ export const ChatModal: React.FC<ChatModalProps> = ({ bookingId, currentUser, on
                     className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-xs leading-relaxed shadow-xs ${
                       isMine
                         ? 'bg-indigo-600 text-white rounded-br-xs'
-                        : 'bg-white text-slate-800 border border-slate-200 rounded-bl-xs'
+                        : 'bg-slate-800 text-slate-200 border border-white/5 rounded-bl-xs'
                     }`}
                   >
                     {m.body}
                   </div>
                   {m.isFlaggedForLeakage && (
-                    <span className="text-[9px] text-amber-600 mt-0.5 px-1 font-semibold flex items-center gap-1">
+                    <span className="text-[9px] text-amber-400 mt-0.5 px-1 font-semibold flex items-center gap-1">
                       <AlertTriangle className="w-2.5 h-2.5" />
                       Off-platform contact flagged by safety filter
                     </span>
@@ -145,23 +151,23 @@ export const ChatModal: React.FC<ChatModalProps> = ({ bookingId, currentUser, on
         </div>
 
         {/* Input Bar */}
-        <form onSubmit={handleSend} className="p-3 border-t border-slate-200 bg-white flex items-center gap-2">
+        <form onSubmit={handleSend} className="p-3 border-t border-white/10 bg-slate-900 flex items-center gap-2">
           <input
             type="text"
             value={inputBody}
             onChange={(e) => setInputBody(e.target.value)}
-            placeholder="Type a message (e.g. 'I am outside Kendall Hall Room 204')..."
-            className="flex-1 bg-slate-50 px-3 py-2 rounded-lg text-xs text-slate-900 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            placeholder="Type message (e.g. 'I am outside Kendall Hall Room 204')..."
+            className="flex-1 bg-slate-800 px-3 py-2 rounded-xl text-xs text-white placeholder-slate-400 border border-white/10 focus:outline-none focus:border-indigo-500"
           />
           <button
             type="submit"
             disabled={!inputBody.trim()}
-            className="p-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white rounded-lg transition-colors shadow-xs"
+            className="p-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white rounded-xl transition-all shadow-md cursor-pointer"
           >
             <Send className="w-4 h-4" />
           </button>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };

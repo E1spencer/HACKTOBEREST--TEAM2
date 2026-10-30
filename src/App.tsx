@@ -26,7 +26,10 @@ import {
   CalendarDays,
   Briefcase,
   Layers,
+  Zap,
+  ArrowRight,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<string>('ai-assistant');
@@ -56,7 +59,6 @@ export default function App() {
     setCurrentUser(user);
     showToast(`Switched active persona to ${user.displayName} (${user.role.toUpperCase()})`);
 
-    // Smart route switch based on role
     if (user.role === 'agent' && currentTab === 'ai-assistant') {
       setCurrentTab('helper-portal');
     } else if (user.role === 'admin' && currentTab !== 'admin') {
@@ -80,7 +82,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans bg-grid-pattern selection:bg-indigo-500 selection:text-white">
       {/* Top Navigation */}
       <Navbar
         currentTab={currentTab}
@@ -91,8 +93,57 @@ export default function App() {
         onResetSeed={handleResetSeed}
       />
 
+      {/* Preset Quick Explore Bar */}
+      <div className="border-b border-white/5 bg-slate-900/40 backdrop-blur-md py-2.5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3 text-xs overflow-x-auto scrollbar-none">
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-bold text-white text-[11px] uppercase tracking-wider font-heading">
+              Oakwood Live:
+            </span>
+            <span className="text-slate-400 text-[11px]">142 peer helpers verified today</span>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-slate-500 text-[11px]">Quick Demos:</span>
+            <button
+              onClick={() => {
+                setCurrentTab('bookings');
+                showToast('Jumped to active Escrow booking demo!');
+              }}
+              className="px-2.5 py-1 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/40 text-emerald-300 text-[11px] font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+            >
+              <span>$55.00 Escrow Held Demo</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+
+            <button
+              onClick={() => {
+                setCurrentTab('helper-portal');
+                showToast('Opened Student Helper Workspace & Wallet');
+              }}
+              className="px-2.5 py-1 rounded-lg bg-indigo-950/60 hover:bg-indigo-900/80 border border-indigo-500/40 text-indigo-300 text-[11px] font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+            >
+              <span>Helper Wallet & Jobs</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+
+            <button
+              onClick={() => {
+                setCurrentTab('admin');
+                showToast('Opened Trust & Safety Administration Portal');
+              }}
+              className="px-2.5 py-1 rounded-lg bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/40 text-amber-300 text-[11px] font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+            >
+              <span>Trust & Safety Desk</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Main Content Viewport */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-7">
         {currentTab === 'ai-assistant' && (
           <AiMatchingPanel
             onBookAgent={(agent) => setBookingAgent(agent)}
@@ -126,12 +177,19 @@ export default function App() {
       </main>
 
       {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            className="fixed bottom-6 right-6 z-50 glass-panel bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl border border-white/10 text-xs font-semibold flex items-center gap-2.5"
+          >
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Modals */}
       {bookingAgent && (
@@ -182,10 +240,10 @@ export default function App() {
       )}
 
       {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2 font-medium text-slate-700">
-            <GraduationCap className="w-4 h-4 text-indigo-600" />
+      <footer className="glass-panel border-t border-white/5 mt-16 py-8 text-center text-xs text-slate-400">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2 font-bold text-white font-heading">
+            <GraduationCap className="w-5 h-5 text-indigo-400" />
             <span>CampusHelp · Oakwood University Student Marketplace</span>
           </div>
           <div className="flex items-center gap-4 text-[11px] text-slate-400">
